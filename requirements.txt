@@ -1,0 +1,41 @@
+# data & configuration
+datasets>=2.19.0
+pandas>=2.2.0
+pyyaml>=6.0
+python-box>=7.0.0
+ensure>=1.0.0
+python-dotenv>=1.0.0
+
+# embeddings
+sentence-transformers>=2.7.0
+
+# RAG frameworks
+llama-index>=0.10.0
+llama-index-embeddings-huggingface>=0.2.0
+llama-index-vector-stores-qdrant>=0.2.0
+llama-index-llms-ollama>=0.1.0
+
+# vector store
+qdrant-client>=1.9.0
+
+# LLM local
+ollama>=0.2.0
+
+# RAG evaluation
+ragas>=0.1.7
+
+# API
+fastapi>=0.111.0
+uvicorn>=0.29.0
+
+# tracking
+mlflow>=2.13.0
+
+# tests
+pytest>=8.2.0
+
+# utils
+tqdm>=4.66.0
+
+# local package
+-e .
