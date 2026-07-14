@@ -3,6 +3,7 @@
 .python-version
 
 __python-cache__/
+__pycache__/
 *.egg-info/
 
 .env
