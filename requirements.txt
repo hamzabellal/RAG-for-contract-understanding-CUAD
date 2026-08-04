@@ -22,7 +22,17 @@ qdrant-client>=1.9.0
 ollama>=0.2.0
 
 # RAG evaluation
-ragas>=0.1.7
+# versions figées : ragas>=0.4 importe inconditionnellement langchain_community.chat_models.vertexai,
+# module supprimé dans les langchain-community récents (>0.3.x) -> ModuleNotFoundError sinon
+ragas==0.2.15
+langchain==0.3.27
+langchain-community==0.3.27
+langchain-core==0.3.86
+langchain-openai==0.3.35
+langchain-anthropic==0.3.22
+
+# juge ragas via API (Claude Sonnet 5)
+anthropic>=0.40.0
 
 # API
 fastapi>=0.111.0

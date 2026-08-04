@@ -19,3 +19,6 @@ artifacts/
 mlruns/
 mlartifacts/
 .mlflow/
+
+project_documentation_v1.pdf
+context.md
