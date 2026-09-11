@@ -21,4 +21,8 @@ mlartifacts/
 .mlflow/
 
 project_documentation_v1.pdf
+project_documentation_v2.pdf
 context.md
+context_v2.md
+
+.DS_Store

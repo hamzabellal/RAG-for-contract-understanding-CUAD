@@ -53,3 +53,8 @@ ipykernel>=6.34.0
 
 transformers
 huggingface-hub
+
+llama-index-embeddings-ollama>=0.3.0
+
+# retrieval hybride (sparse BM25 via fastembed, utilisé par QdrantVectorStore enable_hybrid=True)
+fastembed>=0.3.0
