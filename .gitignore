@@ -16,6 +16,7 @@ secrets.yaml
 logs/
 *.log
 artifacts/
+artifacts_exploration/
 mlruns/
 mlartifacts/
 .mlflow/
