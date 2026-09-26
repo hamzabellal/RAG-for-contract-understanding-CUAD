@@ -1,0 +1,8 @@
+artifacts_root : artifacts
+
+data_ingestion:
+  root_dir: artifacts/data_ingestion
+  data_source: "theatticusproject/cuad-qa"
+  full_data_dir: artifacts/data_ingestion/full_data.jsonl.gz
+  contracts: artifacts/data_ingestion/unique_contracts.parquet
+  cleaned_contracts: artifacts/data_ingestion/cleaned_contracts.parquet
