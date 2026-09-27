@@ -25,3 +25,20 @@ class ConfigurationManager():
         )
 
         return data_ingestion_config
+
+    def get_chunking_config(self) -> ChunkingConfig:
+        config = self.config.chunking
+        params = self.params.chunking
+
+        create_directories([config.root_dir])
+
+        chunking_config = ChunkingConfig(
+            root_dir = config.root_dir,
+            data_source = config.data_source,
+            chunks_path = config.chunks_path,
+            chunk_size = params.chunk_size,
+            chunk_overlap = params.chunk_overlap,
+            tokenizer_name = params.tokenizer
+        )
+
+        return chunking_config

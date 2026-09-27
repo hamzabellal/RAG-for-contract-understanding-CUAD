@@ -10,3 +10,12 @@ class DataIngestionConfig:
     full_data_dir: Path
     contracts: Path
     cleaned_contracts: Path
+
+@dataclass(frozen=True)
+class ChunkingConfig:
+    root_dir : Path
+    data_source : Path
+    chunks_path : Path
+    chunk_size : int
+    chunk_overlap : int
+    tokenizer_name : str

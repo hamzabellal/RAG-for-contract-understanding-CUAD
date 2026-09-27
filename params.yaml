@@ -1,2 +1,4 @@
 chunking:
-  chnuk_size : 50
+  chunk_size : 512
+  chunk_overlap : 50
+  tokenizer : "BAAI/bge-small-en-v1.5"
