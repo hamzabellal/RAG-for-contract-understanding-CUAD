@@ -6,3 +6,8 @@ data_ingestion:
   full_data_dir: artifacts/data_ingestion/full_data.jsonl.gz
   contracts: artifacts/data_ingestion/unique_contracts.parquet
   cleaned_contracts: artifacts/data_ingestion/cleaned_contracts.parquet
+
+chunking:
+  root_dir: artifacts/chunking
+  data_source: artifacts/data_ingestion/cleaned_contracts.parquet
+  chunks_path: artifacts/chunking/chunks.parquet
