@@ -2,3 +2,7 @@ chunking:
   chunk_size : 512
   chunk_overlap : 50
   tokenizer : "BAAI/bge-small-en-v1.5"
+
+embedding:
+  embedding_model_name: "BAAI/bge-large-en-v1.5"
+  sparse_model_name: "Qdrant/bm25"

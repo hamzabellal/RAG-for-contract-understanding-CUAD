@@ -19,3 +19,13 @@ class ChunkingConfig:
     chunk_size : int
     chunk_overlap : int
     tokenizer_name : str
+
+@dataclass(frozen=True)
+class EmbeddingIndexingConfig:
+    root_dir: Path
+    chunks_path: Path
+    qdrant_url: str
+    collection_name: str
+    embedding_model_name: str
+    sparse_model_name: str
+    report_path: Path
