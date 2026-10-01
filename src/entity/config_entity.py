@@ -29,3 +29,21 @@ class EmbeddingIndexingConfig:
     embedding_model_name: str
     sparse_model_name: str
     report_path: Path
+
+@dataclass(frozen=True)
+class RetrievalConfig:
+    root_dir: Path
+    chunks_path: Path
+    qdrant_url: str
+    collection_name: str
+    reranker_model_name: str
+    embedding_model_name: str
+    sparse_model_name: str
+    tier1_categories: List[str]
+    tier3_categories: List[str]
+    retrieve_top_k: int
+    sparse_top_k: int
+    rerank_top_n: int
+    retrieve_top_k_tier3: int
+    sparse_top_k_tier3: int
+    rerank_top_n_tier3: int
