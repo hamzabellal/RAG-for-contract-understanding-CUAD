@@ -18,3 +18,9 @@ embedding:
   qdrant_url: "http://localhost:6333"
   collection_name: "cuad_bge_large_bm25_hybrid"
   report_path: artifacts/embeddings/indexing_report.json
+
+retrieval:
+  root_dir: artifacts/retrieval
+  chunks_path: artifacts/chunking/chunks.parquet
+  qdrant_url: "http://localhost:6333"
+  collection_name: "cuad_bge_large_bm25_hybrid"

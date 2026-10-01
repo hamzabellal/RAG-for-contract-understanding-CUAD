@@ -61,3 +61,29 @@ class ConfigurationManager():
         )
 
         return embedding_config
+
+    def get_retrieval_config(self) -> RetrievalConfig:
+        config = self.config.retrieval
+        params = self.params.retrieval
+
+        create_directories([config.root_dir])
+
+        retrieval_config = RetrievalConfig(
+            root_dir = Path(config.root_dir),
+            chunks_path = Path(config.chunks_path),
+            qdrant_url = config.qdrant_url,
+            collection_name = config.collection_name,
+            reranker_model_name = params.reranker_model_name,
+            embedding_model_name = params.embedding_model_name,
+            sparse_model_name = params.sparse_model_name,
+            tier1_categories = params.tier1_categories,
+            tier3_categories = params.tier3_categories,
+            retrieve_top_k = params.retrieve_top_k,
+            sparse_top_k = params.sparse_top_k,
+            rerank_top_n = params.rerank_top_n,
+            retrieve_top_k_tier3 = params.retrieve_top_k_tier3,
+            sparse_top_k_tier3 = params.sparse_top_k_tier3,
+            rerank_top_n_tier3 = params.rerank_top_n_tier3
+        )
+
+        return retrieval_config
