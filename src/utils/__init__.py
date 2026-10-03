@@ -8,6 +8,8 @@ from box.exceptions import BoxValueError
 from src.logger import logging
 from src.exception import CustomException
 from ensure import ensure_annotations
+from typing import Union
+
 
 @ensure_annotations
 def read_yaml(path_to_yaml:Path) -> ConfigBox:
@@ -30,7 +32,7 @@ def create_directories(path_to_directories: list, verbose=True):
 
 
 @ensure_annotations
-def save_json(filepath: Path, obj: dict):
+def save_json(filepath: Path, obj: Union[dict, list]):
     try:
         dir_name = os.path.dirname(filepath)
         os.makedirs(dir_name, exist_ok=True)

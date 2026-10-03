@@ -87,3 +87,19 @@ class ConfigurationManager():
         )
 
         return retrieval_config
+
+    def get_generation_config(self) -> GenerationConfig:
+        config = self.config.generation
+        params = self.params.generation
+
+        create_directories([config.root_dir])
+
+        generation_config = GenerationConfig(
+            root_dir = Path(config.root_dir),
+            llm_model_name = params.llm_model_name,
+            request_timeout = params.request_timeout,
+            temperature = params.temperature,
+            use_reasoning = params.use_reasoning
+        )
+
+        return generation_config
