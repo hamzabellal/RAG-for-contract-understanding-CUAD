@@ -47,3 +47,11 @@ class RetrievalConfig:
     retrieve_top_k_tier3: int
     sparse_top_k_tier3: int
     rerank_top_n_tier3: int
+
+@dataclass(frozen=True)
+class GenerationConfig:
+    root_dir: Path
+    llm_model_name: str
+    request_timeout: int
+    temperature: float
+    use_reasoning: bool

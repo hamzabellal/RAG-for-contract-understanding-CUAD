@@ -24,3 +24,6 @@ retrieval:
   chunks_path: artifacts/chunking/chunks.parquet
   qdrant_url: "http://localhost:6333"
   collection_name: "cuad_bge_large_bm25_hybrid"
+
+generation:
+  root_dir: artifacts/generation

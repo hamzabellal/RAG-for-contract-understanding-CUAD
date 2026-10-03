@@ -22,3 +22,9 @@ retrieval:
   retrieve_top_k_tier3: 15
   sparse_top_k_tier3: 15
   rerank_top_n_tier3: 5
+
+generation:
+  llm_model_name: "qwen2.5:7b"
+  request_timeout: 180
+  temperature: 0.0
+  use_reasoning: true

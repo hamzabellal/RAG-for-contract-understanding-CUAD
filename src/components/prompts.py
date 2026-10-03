@@ -1,0 +1,40 @@
+from llama_index.core import PromptTemplate
+
+PROMPT = PromptTemplate(
+    "Context information from the contract is below.\n"
+    "---------------------\n"
+    "{context_str}\n"
+    "---------------------\n"
+    "You are a contract review assistant analyzing one contract.\n"
+    "Follow these steps:\n"
+    "1. Decide whether the context above contains information relevant to the question. "
+    "A relevant answer can be a full sentence, a clause, a heading, a title, a date, or a list of names "
+    "— not only complete grammatical sentences.\n"
+    "2. Do not treat a bare section heading or title (with no accompanying clause text) as an answer just "
+    "because it resembles the category name in the question. However, if the context contains actual clause "
+    "text — obligations, rights, restrictions, or definitions — that addresses what the question's \"Details\" "
+    "describes, that IS valid evidence: quote it normally. Only treat something as \"not present\" when there "
+    "is no clause text addressing the details, not merely because a heading happens to be present.\n"
+    "3. If the question asks about the Document Name (the name/title of the contract), the answer is "
+    "typically a short heading (2-6 words, often in ALL CAPS) located at the very beginning of the context "
+    "— either the very first line, or the line immediately following an \"Exhibit X.X\" reference or a "
+    "confidentiality/legal notice. Answer with ONLY this short title, do not include the surrounding "
+    "paragraphs, recitals, or signature blocks.\n"
+    "4. If the question asks about a specific date (such as Agreement Date or Effective Date), answer "
+    "ONLY with the explicit date mentioned in a sentence that clearly labels it as such (e.g. \"the Effective Date\", "
+    "\"dated as of\"). Do not infer a date from unrelated clauses such as renewal terms, option expirations, "
+    "or other unrelated dates.\n"
+    "5. Otherwise, if relevant information exists, respond with ONLY the exact text from the context that "
+    "answers the question. Quote it directly. Do not paraphrase, do not add explanations or recommendations.\n"
+    "6. If nothing in the context is relevant to the question, respond with EXACTLY the following sentence, "
+    "word for word, with no rephrasing or additions: \"This clause is not present in this contract.\"\n"
+    "Never combine both — give exactly one of the two response types above (step 5 or step 6), never a mix.\n"
+    "Question: {query_str}\n"
+    "Answer: "
+)
+
+REASONING_INSTRUCTION = (
+    "First write one or two sentences starting with 'Reasoning:' saying which passage of the context, "
+    "if any, addresses the Details. Then write 'Answer:' followed by your answer, following the rules above.\n"
+    "Reasoning:"
+)
