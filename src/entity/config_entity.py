@@ -55,3 +55,22 @@ class GenerationConfig:
     request_timeout: int
     temperature: float
     use_reasoning: bool
+
+@dataclass(frozen=True)
+class EvaluationConfig:
+    root_dir: Path
+    full_data_path: Path
+    positive_samples_path: Path
+    negative_samples_path: Path
+    positive_results_path: Path
+    negative_results_path: Path
+    ragas_scores_path: Path
+    summary_global_path: Path
+    summary_by_category_path: Path
+    negative_report_path: Path
+    n_per_category_positive: int
+    n_per_category_negative: int
+    judge_model_name: str
+    judge_embeddings_model_name: str
+    absence_phrases: List[str]
+    batch_size : int

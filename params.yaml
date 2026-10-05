@@ -28,3 +28,14 @@ generation:
   request_timeout: 180
   temperature: 0.0
   use_reasoning: true
+
+evaluation:
+  n_per_category_positive: 5
+  n_per_category_negative: 3
+  judge_model_name: "claude-haiku-4-5"
+  judge_embeddings_model_name: "nomic-embed-text"
+  absence_phrases: [
+    "not present", "not specified", "not mentioned", "does not contain",
+    "no clause", "not applicable", "not included", "not found", "n/a", "absent"
+  ]
+  batch_size: 20

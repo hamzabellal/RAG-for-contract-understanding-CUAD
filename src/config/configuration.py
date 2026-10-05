@@ -103,3 +103,30 @@ class ConfigurationManager():
         )
 
         return generation_config
+
+    def get_evaluation_config(self) -> EvaluationConfig:
+        config = self.config.evaluation
+        params = self.params.evaluation
+
+        create_directories([config.root_dir])
+
+        evaluation_config = EvaluationConfig(
+            root_dir = Path(config.root_dir),
+            full_data_path = Path(config.full_data_path),
+            positive_samples_path = Path(config.positive_samples_path),
+            negative_samples_path = Path(config.negative_samples_path),
+            positive_results_path = Path(config.positive_results_path),
+            negative_results_path = Path(config.negative_results_path),
+            ragas_scores_path = Path(config.ragas_scores_path),
+            summary_global_path = Path(config.summary_global_path),
+            summary_by_category_path = Path(config.summary_by_category_path),
+            negative_report_path = Path(config.negative_report_path),
+            n_per_category_positive = params.n_per_category_positive,
+            n_per_category_negative = params.n_per_category_negative,
+            judge_model_name = params.judge_model_name,
+            judge_embeddings_model_name = params.judge_embeddings_model_name,
+            absence_phrases = params.absence_phrases,
+            batch_size = params.batch_size
+        )
+
+        return evaluation_config
