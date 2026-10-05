@@ -52,7 +52,7 @@ class Generator:
             results, done = [], set()
 
         remaining = [r for r in items if (r["title"], r["question"]) not in done]
-        logging.info(f"Reprise : {len(results)} déjà faits, {len(remaining)} restants")
+        logging.info(f"Batch processing: {len(results)} already done, {len(remaining)} remaining to process")
 
         for item in tqdm(remaining):
             try:
@@ -60,7 +60,7 @@ class Generator:
             except Exception as e:
                 output = {"answer": f"[ERROR: {type(e).__name__}: {e}]", "contexts": []}
 
-            results.append({"title": item["title"], "question": item["question"], "answer": output["answer"]})
+            results.append({**item, "answer": output["answer"], "contexts": output["contexts"]})
             save_json(output_path, results)
 
         return results

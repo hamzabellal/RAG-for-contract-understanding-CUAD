@@ -27,3 +27,15 @@ retrieval:
 
 generation:
   root_dir: artifacts/generation
+
+evaluation:
+  root_dir: artifacts/evaluation
+  full_data_path: artifacts/data_ingestion/full_data.jsonl.gz
+  positive_samples_path: artifacts/evaluation/positive_samples.json
+  negative_samples_path: artifacts/evaluation/negative_samples.json
+  positive_results_path: artifacts/evaluation/positive_results.json
+  negative_results_path: artifacts/evaluation/negative_results.json
+  ragas_scores_path: artifacts/evaluation/ragas_scores.json
+  summary_global_path: artifacts/evaluation/summary_global.json
+  summary_by_category_path: artifacts/evaluation/summary_by_category.json
+  negative_report_path: artifacts/evaluation/negative_report.json
