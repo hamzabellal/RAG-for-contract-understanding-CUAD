@@ -1,0 +1,5 @@
+outs:
+- md5: 41c7bb118f091edc7362cbe991e048fa
+  size: 382438526
+  hash: md5
+  path: full_data.jsonl.gz
