@@ -1,0 +1,105 @@
+stages:
+  data_ingestion:
+    cmd: python main.py data_ingestion
+    deps:
+    - src/components/data_ingestion.py
+    - src/pipeline/data_ingestion.py
+    params:
+    - config/config.yaml:
+      - data_ingestion.data_source
+    outs:
+    - artifacts/data_ingestion/cleaned_contracts.parquet
+    - artifacts/data_ingestion/full_data.jsonl.gz
+    - artifacts/data_ingestion/unique_contracts.parquet
+  chunking:
+    cmd: python main.py chunking
+    deps:
+    - artifacts/data_ingestion/cleaned_contracts.parquet
+    - src/components/chunking.py
+    - src/pipeline/chunking.py
+    params:
+    - chunking.chunk_overlap
+    - chunking.chunk_size
+    - chunking.tokenizer
+    outs:
+    - artifacts/chunking/chunks.parquet
+  embedding_indexing:
+    cmd: python main.py embedding_indexing
+    deps:
+    - artifacts/chunking/chunks.parquet
+    - src/components/embedding_indexing.py
+    - src/pipeline/embedding_indexing.py
+    params:
+    - embedding.embedding_model_name
+    - embedding.sparse_model_name
+    - config/config.yaml:
+      - embedding.collection_name
+      - embedding.qdrant_url
+    outs:
+    - artifacts/embeddings/indexing_report.json
+  eval_samples:
+    cmd: python main.py eval_samples
+    deps:
+    - artifacts/data_ingestion/full_data.jsonl.gz
+    - src/components/evaluation.py
+    - src/pipeline/eval_samples.py
+    params:
+    - evaluation.n_per_category_negative
+    - evaluation.n_per_category_positive
+    outs:
+    - artifacts/evaluation/negative_samples.json
+    - artifacts/evaluation/positive_samples.json
+  generation:
+    cmd: python main.py generation
+    deps:
+    - artifacts/embeddings/indexing_report.json
+    - artifacts/evaluation/negative_samples.json
+    - artifacts/evaluation/positive_samples.json
+    - src/components/generation.py
+    - src/components/prompts.py
+    - src/components/retrieval.py
+    - src/pipeline/generation.py
+    - src/pipeline/retrieval.py
+    params:
+    - generation.llm_model_name
+    - generation.request_timeout
+    - generation.temperature
+    - generation.use_reasoning
+    - retrieval.embedding_model_name
+    - retrieval.rerank_top_n
+    - retrieval.rerank_top_n_tier3
+    - retrieval.reranker_model_name
+    - retrieval.retrieve_top_k
+    - retrieval.retrieve_top_k_tier3
+    - retrieval.sparse_model_name
+    - retrieval.sparse_top_k
+    - retrieval.sparse_top_k_tier3
+    - retrieval.tier1_categories
+    - retrieval.tier3_categories
+    - config/config.yaml:
+      - retrieval.chunks_path
+      - retrieval.collection_name
+      - retrieval.qdrant_url
+    outs:
+    - artifacts/evaluation/negative_results.json
+    - artifacts/evaluation/positive_results.json
+  evaluation:
+    cmd: python main.py evaluation
+    deps:
+    - artifacts/evaluation/negative_results.json
+    - artifacts/evaluation/positive_results.json
+    - src/components/evaluation.py
+    - src/pipeline/evaluation.py
+    params:
+    - evaluation.absence_phrases
+    - evaluation.batch_size
+    - evaluation.judge_embeddings_model_name
+    - evaluation.judge_model_name
+    outs:
+    - artifacts/evaluation/ragas_scores.json
+    - artifacts/evaluation/summary_by_category.json
+    metrics:
+    - artifacts/evaluation/negative_report.json:
+        cache: false
+    - artifacts/evaluation/summary_global.json:
+        cache: false
