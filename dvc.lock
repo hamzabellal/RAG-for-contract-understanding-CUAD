@@ -1,0 +1,238 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python main.py data_ingestion
+    deps:
+    - path: src/components/data_ingestion.py
+      hash: md5
+      md5: 0ea0bcb053df89e3919741845a6a6356
+      size: 3196
+    - path: src/pipeline/data_ingestion.py
+      hash: md5
+      md5: f72b1afd9b5cf9d5dafa72395ee2f9fa
+      size: 876
+    params:
+      config/config.yaml:
+        data_ingestion.data_source: theatticusproject/cuad-qa
+    outs:
+    - path: artifacts/data_ingestion/cleaned_contracts.parquet
+      hash: md5
+      md5: 1e201cb345fa3dc5c35d25c128c5d9b2
+      size: 22986487
+    - path: artifacts/data_ingestion/full_data.jsonl.gz
+      hash: md5
+      md5: 41c7bb118f091edc7362cbe991e048fa
+      size: 382438526
+    - path: artifacts/data_ingestion/unique_contracts.parquet
+      hash: md5
+      md5: 31a0657c90d1d880688b7b7296fcaced
+      size: 11644998
+  chunking:
+    cmd: python main.py chunking
+    deps:
+    - path: artifacts/data_ingestion/cleaned_contracts.parquet
+      hash: md5
+      md5: 1e201cb345fa3dc5c35d25c128c5d9b2
+      size: 22986487
+    - path: src/components/chunking.py
+      hash: md5
+      md5: f0e5eb6c023ba2edee14025b92740fca
+      size: 2388
+    - path: src/pipeline/chunking.py
+      hash: md5
+      md5: 84aad22110b1c91e471d71d6bb8458c1
+      size: 781
+    params:
+      params.yaml:
+        chunking.chunk_overlap: 50
+        chunking.chunk_size: 512
+        chunking.tokenizer: BAAI/bge-small-en-v1.5
+    outs:
+    - path: artifacts/chunking/chunks.parquet
+      hash: md5
+      md5: 528faab2be71561e1085d011a866b998
+      size: 11646058
+  embedding_indexing:
+    cmd: python main.py embedding_indexing
+    deps:
+    - path: artifacts/chunking/chunks.parquet
+      hash: md5
+      md5: 528faab2be71561e1085d011a866b998
+      size: 11646058
+    - path: src/components/embedding_indexing.py
+      hash: md5
+      md5: 3da3e689f928078ef8a9d29673b4c732
+      size: 3129
+    - path: src/pipeline/embedding_indexing.py
+      hash: md5
+      md5: 98501def28975f941da31f57fb2eb494
+      size: 880
+    params:
+      params.yaml:
+        embedding.embedding_model_name: BAAI/bge-large-en-v1.5
+        embedding.sparse_model_name: Qdrant/bm25
+      config/config.yaml:
+        embedding.collection_name: cuad_bge_large_bm25_hybrid
+        embedding.qdrant_url: http://localhost:6333
+    outs:
+    - path: artifacts/embeddings/indexing_report.json
+      hash: md5
+      md5: dfa180ae1d1129d8288dffe7499d0b31
+      size: 203
+  eval_samples:
+    cmd: python main.py eval_samples
+    deps:
+    - path: artifacts/data_ingestion/full_data.jsonl.gz
+      hash: md5
+      md5: 41c7bb118f091edc7362cbe991e048fa
+      size: 382438526
+    - path: src/components/evaluation.py
+      hash: md5
+      md5: 74d52b9f7a23b54f9b1d0de33d76a3d5
+      size: 10207
+    - path: src/pipeline/eval_samples.py
+      hash: md5
+      md5: 6a8bf240e09c705976fce49eb4a89ce0
+      size: 968
+    params:
+      params.yaml:
+        evaluation.n_per_category_negative: 3
+        evaluation.n_per_category_positive: 5
+    outs:
+    - path: artifacts/evaluation/negative_samples.json
+      hash: md5
+      md5: 8177f26fbd4c0d6a2a0f151994777b71
+      size: 50001
+    - path: artifacts/evaluation/positive_samples.json
+      hash: md5
+      md5: 6e2a2a7a88c89ce1542c2440d7ec84b3
+      size: 223876
+  generation:
+    cmd: python main.py generation
+    deps:
+    - path: artifacts/embeddings/indexing_report.json
+      hash: md5
+      md5: dfa180ae1d1129d8288dffe7499d0b31
+      size: 203
+    - path: artifacts/evaluation/negative_samples.json
+      hash: md5
+      md5: 8177f26fbd4c0d6a2a0f151994777b71
+      size: 50001
+    - path: artifacts/evaluation/positive_samples.json
+      hash: md5
+      md5: 6e2a2a7a88c89ce1542c2440d7ec84b3
+      size: 223876
+    - path: src/components/generation.py
+      hash: md5
+      md5: 78867523080eee070c2fcb573a080598
+      size: 2626
+    - path: src/components/prompts.py
+      hash: md5
+      md5: 368d13354d7f397d4fe56ef699dff610
+      size: 2801
+    - path: src/components/retrieval.py
+      hash: md5
+      md5: b02d0125df9f06caa685e05e22f74211
+      size: 4169
+    - path: src/pipeline/generation.py
+      hash: md5
+      md5: a69a37cdb0c74f5a92f86dfea009d23f
+      size: 1728
+    - path: src/pipeline/retrieval.py
+      hash: md5
+      md5: 065f24d0caf2860bc6209bb9915218cd
+      size: 1118
+    params:
+      params.yaml:
+        generation.llm_model_name: qwen2.5:7b
+        generation.request_timeout: 180
+        generation.temperature: 0.0
+        generation.use_reasoning: true
+        retrieval.embedding_model_name: BAAI/bge-large-en-v1.5
+        retrieval.rerank_top_n: 3
+        retrieval.rerank_top_n_tier3: 5
+        retrieval.reranker_model_name: BAAI/bge-reranker-v2-m3
+        retrieval.retrieve_top_k: 10
+        retrieval.retrieve_top_k_tier3: 15
+        retrieval.sparse_model_name: Qdrant/bm25
+        retrieval.sparse_top_k: 10
+        retrieval.sparse_top_k_tier3: 15
+        retrieval.tier1_categories:
+        - Document Name
+        - Parties
+        retrieval.tier3_categories:
+        - Ip Ownership Assignment
+        - Rofr/Rofo/Rofn
+        - Warranty Duration
+        - Price Restrictions
+        - Affiliate License-Licensor
+        - Covenant Not To Sue
+        - Termination For Convenience
+        - Competitive Restriction Exception
+        - Non-Compete
+        - Insurance
+      config/config.yaml:
+        retrieval.chunks_path: artifacts/chunking/chunks.parquet
+        retrieval.collection_name: cuad_bge_large_bm25_hybrid
+        retrieval.qdrant_url: http://localhost:6333
+    outs:
+    - path: artifacts/evaluation/negative_results.json
+      hash: md5
+      md5: a84fc5573cdc4bd9fd6320c2c16ea291
+      size: 803450
+    - path: artifacts/evaluation/positive_results.json
+      hash: md5
+      md5: ea51bd9ca11dda1ce607f45be8c74c33
+      size: 1699575
+  evaluation:
+    cmd: python main.py evaluation
+    deps:
+    - path: artifacts/evaluation/negative_results.json
+      hash: md5
+      md5: a84fc5573cdc4bd9fd6320c2c16ea291
+      size: 803450
+    - path: artifacts/evaluation/positive_results.json
+      hash: md5
+      md5: ea51bd9ca11dda1ce607f45be8c74c33
+      size: 1699575
+    - path: src/components/evaluation.py
+      hash: md5
+      md5: 74d52b9f7a23b54f9b1d0de33d76a3d5
+      size: 10207
+    - path: src/pipeline/evaluation.py
+      hash: md5
+      md5: c8dd1bee62a7a0f2af9dcf01733ca407
+      size: 924
+    params:
+      params.yaml:
+        evaluation.absence_phrases:
+        - not present
+        - not specified
+        - not mentioned
+        - does not contain
+        - no clause
+        - not applicable
+        - not included
+        - not found
+        - n/a
+        - absent
+        evaluation.batch_size: 20
+        evaluation.judge_embeddings_model_name: nomic-embed-text
+        evaluation.judge_model_name: claude-haiku-4-5
+    outs:
+    - path: artifacts/evaluation/negative_report.json
+      hash: md5
+      md5: 7b5a4169861e40528be02db9d2f5b202
+      size: 110
+    - path: artifacts/evaluation/ragas_scores.json
+      hash: md5
+      md5: 3dffa9e021ca7dd68eca286a61221cc6
+      size: 1738882
+    - path: artifacts/evaluation/summary_by_category.json
+      hash: md5
+      md5: e42f61167bccb96f20d3a6141362565d
+      size: 9955
+    - path: artifacts/evaluation/summary_global.json
+      hash: md5
+      md5: 3ad34a8775d8d4f62da04fb58c3bb267
+      size: 208

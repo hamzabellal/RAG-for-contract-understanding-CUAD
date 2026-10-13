@@ -27,7 +27,7 @@ class ChatAnthropicNoTemp(ChatAnthropic):
 
 
 class Evaluator:
-    def __init__(self, config: EvaluationConfig, generator: Generator):
+    def __init__(self, config: EvaluationConfig, generator: Generator = None):
         self.evaluation_config = config
         self.generator = generator
 
