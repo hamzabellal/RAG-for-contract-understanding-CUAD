@@ -95,9 +95,13 @@ stages:
     - evaluation.batch_size
     - evaluation.judge_embeddings_model_name
     - evaluation.judge_model_name
+    - config/config.yaml:
+      - evaluation.mlflow_tracking_uri
+      - evaluation.mlflow_experiment_name
     outs:
     - artifacts/evaluation/ragas_scores.json
     - artifacts/evaluation/summary_by_category.json
+    - artifacts/evaluation/mlflow_run.json
     metrics:
     - artifacts/evaluation/negative_report.json:
         cache: false

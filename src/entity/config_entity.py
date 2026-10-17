@@ -68,6 +68,9 @@ class EvaluationConfig:
     summary_global_path: Path
     summary_by_category_path: Path
     negative_report_path: Path
+    mlflow_tracking_uri: str
+    mlflow_run_id_path: Path
+    mlflow_experiment_name: str
     n_per_category_positive: int
     n_per_category_negative: int
     judge_model_name: str

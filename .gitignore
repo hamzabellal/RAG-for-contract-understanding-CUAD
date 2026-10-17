@@ -25,6 +25,8 @@ artifacts_exploration/
 mlruns/
 mlartifacts/
 .mlflow/
+postgres_data/
+mlflow_artifacts/
 
 project_documentation_v1.pdf
 project_documentation_v2.pdf

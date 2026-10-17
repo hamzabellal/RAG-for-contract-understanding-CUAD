@@ -62,3 +62,4 @@ fastembed>=0.3.0
 pyarrow
 
 dvc
+mlflow
