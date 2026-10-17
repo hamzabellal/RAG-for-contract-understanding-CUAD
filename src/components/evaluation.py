@@ -3,6 +3,8 @@ import os
 import json
 import pandas as pd
 import re
+import mlflow
+from mlflow import MlflowClient
 from dotenv import load_dotenv
 from collections import Counter
 from langchain_anthropic import ChatAnthropic
@@ -18,6 +20,7 @@ from src.exception import CustomException
 from src.entity.config_entity import EvaluationConfig
 from src.components.generation import Generator
 from src.utils import save_json
+from src.config.configuration import ConfigurationManager
 
 class ChatAnthropicNoTemp(ChatAnthropic):
     def __setattr__(self, name, value):
@@ -172,6 +175,10 @@ class Evaluator:
 
                 save_json(output_path, existing_scores)
 
+                df_partial = pd.DataFrame(existing_scores)
+                for col in ["faithfulness", "answer_relevancy", "context_precision", "context_recall", "answer_correctness"]:
+                    mlflow.log_metric(col, df_partial[col].mean(), step=i)
+
             df_scores = pd.DataFrame(existing_scores)
             metric_cols = ["faithfulness", "answer_relevancy", "context_precision", "context_recall", "answer_correctness"]
             summary_global = df_scores[metric_cols].mean().to_dict()
@@ -212,6 +219,50 @@ class Evaluator:
         return report
 
     def run(self) -> dict:
+        mlflow.set_tracking_uri(self.evaluation_config.mlflow_tracking_uri)
+        
+        try:
+            client = MlflowClient()
+            client.search_experiments(max_results=1)
+        except Exception as e:
+            raise CustomException(e, sys)
+
+        mlflow.set_experiment(self.evaluation_config.mlflow_experiment_name)
+
+        run_id_path = self.evaluation_config.mlflow_run_id_path
+        resumed = False
+
+        if os.path.exists(run_id_path):
+            with open(run_id_path) as f:
+                run_id = json.load(f)["run_id"]
+            try:
+                mlflow.start_run(run_id=run_id)
+                resumed = True
+                logging.info(f"resuming mlflow run {run_id}")
+            except Exception:
+                logging.info(f"could not resume mlflow run {run_id}, start a new one")
+
+        if not resumed:
+            active_run = mlflow.start_run()
+            run_id = active_run.info.run_id
+            save_json(run_id_path, {"run_id": run_id})
+            logging.info(f"started new mlflow run {run_id}")
+
+
+        config_manager = ConfigurationManager()
+
+        def prefixed(prefix, config_obj):
+            return {f"{prefix}.{k}": v for k, v in vars(config_obj).items()}
+
+        params = {}
+
+        params.update(prefixed("chunking", config_manager.get_chunking_config()))
+        params.update(prefixed("embedding", config_manager.get_embedding_config()))
+        params.update(prefixed("retrieval", config_manager.get_retrieval_config()))
+        params.update(prefixed("generation", config_manager.get_generation_config()))
+        params.update(prefixed("evaluation", config_manager.get_evaluation_config()))
+        mlflow.log_params(params)
+        
         positive_samples, negative_samples = self.build_eval_samples()
 
         positive_results = self.generator.run_batch(positive_samples, self.evaluation_config.positive_results_path)
@@ -220,6 +271,15 @@ class Evaluator:
         self.initiate_evaluation()
         _, summary_global, _ = self.evaluate_positive(positive_results)
         negative_report = self.evaluate_negative(negative_results)
+
+        for metric_name, value in summary_global.items():
+            mlflow.log_metric(metric_name, value)
+        mlflow.log_metric("false_positive_rate", negative_report["false_positive_rate"])
+
+        mlflow.log_artifact(self.evaluation_config.summary_by_category_path)
+        mlflow.log_artifact(self.evaluation_config.ragas_scores_path)
+
+        mlflow.end_run()
 
         report = {
             "positive": summary_global,

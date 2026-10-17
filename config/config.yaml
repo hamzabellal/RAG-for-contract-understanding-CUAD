@@ -39,3 +39,6 @@ evaluation:
   summary_global_path: artifacts/evaluation/summary_global.json
   summary_by_category_path: artifacts/evaluation/summary_by_category.json
   negative_report_path: artifacts/evaluation/negative_report.json
+  mlflow_tracking_uri : "http://localhost:5001"
+  mlflow_run_id_path: artifacts/evaluation/mlflow_run.json
+  mlflow_experiment_name : "run_v1"
