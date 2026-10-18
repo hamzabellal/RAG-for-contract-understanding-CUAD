@@ -17,6 +17,9 @@ class Generator:
         self.generation_config = config
         self.retriever = retriever
 
+    def _extract_answer(self, raw: str) -> str:
+        return raw.split("Answer:", 1)[1].strip() if "Answer:" in raw else raw.strip()
+
     def initiate_generation(self):
         logging.info("Preparing llm model and prompt setup for generation")
         try:
@@ -40,7 +43,7 @@ class Generator:
             prompt = prompt[:idx] + REASONING_INSTRUCTION
 
         raw = str(self.llm.complete(prompt))
-        answer = raw.split("Answer:", 1)[1].strip() if "Answer:" in raw else raw.strip()
+        answer = self._extract_answer(raw)
         return {"answer": answer, "contexts": retrieved_chunks}
 
     def run_batch(self, items: list[dict], output_path: Path) -> list[dict]:

@@ -8,7 +8,8 @@ from box.exceptions import BoxValueError
 from src.logger import logging
 from src.exception import CustomException
 from ensure import ensure_annotations
-from typing import Union
+from typing import Union, Optional
+import re
 
 
 @ensure_annotations
@@ -38,5 +39,28 @@ def save_json(filepath: Path, obj: Union[dict, list]):
         os.makedirs(dir_name, exist_ok=True)
         with open(filepath, 'w') as f:
             json.dump(obj, f, indent=2)
+    except Exception as e:
+        raise CustomException(e, sys)
+
+
+@ensure_annotations
+def clean_content(text:str) -> str:
+    logging.info("starting cleaning contracts text")
+    try:
+        text = re.sub(r"[ \t]{2,}", " ", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        text = "\n".join(line.strip() for line in text.split('\n'))
+        return text.strip()
+    except Exception as e:
+        raise CustomException(e, sys)
+
+
+@ensure_annotations
+def extract_category(question: str) -> Optional[str]:
+    logging.info("extracting corresponding category")
+    try:
+        match = re.search(r'"([^"]+)"', question)
+        category = match.group(1) if match else None
+        return category
     except Exception as e:
         raise CustomException(e, sys)

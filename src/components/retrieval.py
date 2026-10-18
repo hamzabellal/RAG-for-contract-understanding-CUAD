@@ -2,6 +2,7 @@ import sys
 from src.logger import logging
 from src.exception import CustomException
 from src.entity.config_entity import RetrievalConfig
+from src.utils import extract_category
 import re
 import pandas as pd
 from pathlib import Path
@@ -16,12 +17,6 @@ from qdrant_client import QdrantClient
 class Retrieval:
     def __init__(self, config: RetrievalConfig):
         self.retrieval_config = config
-
-    def extract_category(self, question: str) -> str:
-        logging.info("extracting corresponding category")
-        match = re.search(r'"([^"]+)"', question)
-        category = match.group(1) if match else None
-        return category
 
     def strip_boilerplate(self, question: str) -> str:
         match = re.search(r'"([^"]+)"', question)
@@ -80,7 +75,7 @@ class Retrieval:
         return [n.get_content() for n in reranked]
         
     def retrieve(self, question:str, title:str) -> list[str]:
-        category = self.extract_category(question)
+        category = extract_category(question)
         logging.info("start retrieving and reranking")
         if category in self.retrieval_config.tier1_categories:
             return [self._get_tier1_chunk(title)]
