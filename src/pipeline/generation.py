@@ -1,10 +1,11 @@
 import sys
-from src.logger import logging
-from src.exception import CustomException
-from src.config.configuration import ConfigurationManager
-from src.components.generation import Generator
-from src.pipeline.retrieval import RetrievalPipeline
 from pathlib import Path
+
+from src.components.generation import Generator
+from src.config.configuration import ConfigurationManager
+from src.exception import CustomException
+from src.logger import logging
+from src.pipeline.retrieval import RetrievalPipeline
 
 STAGE_NAME = "GENERATION"
 

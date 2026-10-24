@@ -1,27 +1,23 @@
-import sys
-from src.logger import logging
-from src.exception import CustomException
-from src.entity.config_entity import RetrievalConfig
 import re
+import sys
+
 import pandas as pd
-from pathlib import Path
-from llama_index.core.vector_stores import MetadataFilters, ExactMatchFilter
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import VectorStoreIndex
 from llama_index.core.postprocessor import SentenceTransformerRerank
+from llama_index.core.vector_stores import ExactMatchFilter, MetadataFilters
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
+
+from src.entity.config_entity import RetrievalConfig
+from src.exception import CustomException
+from src.logger import logging
+from src.utils import extract_category
 
 
 class Retrieval:
     def __init__(self, config: RetrievalConfig):
         self.retrieval_config = config
-
-    def extract_category(self, question: str) -> str:
-        logging.info("extracting corresponding category")
-        match = re.search(r'"([^"]+)"', question)
-        category = match.group(1) if match else None
-        return category
 
     def strip_boilerplate(self, question: str) -> str:
         match = re.search(r'"([^"]+)"', question)
@@ -80,7 +76,7 @@ class Retrieval:
         return [n.get_content() for n in reranked]
         
     def retrieve(self, question:str, title:str) -> list[str]:
-        category = self.extract_category(question)
+        category = extract_category(question)
         logging.info("start retrieving and reranking")
         if category in self.retrieval_config.tier1_categories:
             return [self._get_tier1_chunk(title)]

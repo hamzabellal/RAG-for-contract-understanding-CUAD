@@ -1,21 +1,26 @@
-import sys
-import os
 import json
-from src.logger import logging
-from src.exception import CustomException
-from src.entity.config_entity import GenerationConfig
-from src.components.retrieval import Retrieval
-from src.utils import save_json
-from src.components.prompts import PROMPT, REASONING_INSTRUCTION
-from llama_index.llms.ollama import Ollama
+import os
+import sys
 from pathlib import Path
+
+from llama_index.llms.ollama import Ollama
 from tqdm import tqdm
+
+from src.components.prompts import PROMPT, REASONING_INSTRUCTION
+from src.components.retrieval import Retrieval
+from src.entity.config_entity import GenerationConfig
+from src.exception import CustomException
+from src.logger import logging
+from src.utils import save_json
 
 
 class Generator:
     def __init__(self, config: GenerationConfig, retriever: Retrieval):
         self.generation_config = config
         self.retriever = retriever
+
+    def _extract_answer(self, raw: str) -> str:
+        return raw.split("Answer:", 1)[1].strip() if "Answer:" in raw else raw.strip()
 
     def initiate_generation(self):
         logging.info("Preparing llm model and prompt setup for generation")
@@ -40,7 +45,7 @@ class Generator:
             prompt = prompt[:idx] + REASONING_INSTRUCTION
 
         raw = str(self.llm.complete(prompt))
-        answer = raw.split("Answer:", 1)[1].strip() if "Answer:" in raw else raw.strip()
+        answer = self._extract_answer(raw)
         return {"answer": answer, "contexts": retrieved_chunks}
 
     def run_batch(self, items: list[dict], output_path: Path) -> list[dict]:

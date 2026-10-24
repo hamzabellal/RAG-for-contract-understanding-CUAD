@@ -63,3 +63,5 @@ pyarrow
 
 dvc
 mlflow
+
+ruff>=0.6.0

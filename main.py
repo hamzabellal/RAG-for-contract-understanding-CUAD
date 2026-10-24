@@ -1,14 +1,15 @@
-import sys
 import argparse
-from src.logger import logging
-from src.exception import CustomException
-from src.pipeline.data_ingestion import DataIngestionPipeline
-from src.pipeline.chunking import ChunkingPipeline
-from src.pipeline.embedding_indexing import EmbeddingIndexingPipeline
-from src.pipeline.generation import GenerationPipeline
-from src.pipeline.evaluation import EvaluationPipeline
-from src.pipeline.eval_samples import EvalSamplesPipeline
+import sys
+
 from src.config.configuration import ConfigurationManager
+from src.exception import CustomException
+from src.logger import logging
+from src.pipeline.chunking import ChunkingPipeline
+from src.pipeline.data_ingestion import DataIngestionPipeline
+from src.pipeline.embedding_indexing import EmbeddingIndexingPipeline
+from src.pipeline.eval_samples import EvalSamplesPipeline
+from src.pipeline.evaluation import EvaluationPipeline
+from src.pipeline.generation import GenerationPipeline
 
 
 def run_data_ingestion():

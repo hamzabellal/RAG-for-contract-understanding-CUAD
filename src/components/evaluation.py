@@ -1,26 +1,33 @@
-import sys
-import os
 import json
-import pandas as pd
-import re
-import mlflow
-from mlflow import MlflowClient
-from dotenv import load_dotenv
+import os
+import sys
 from collections import Counter
+
+import mlflow
+import pandas as pd
+from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from llama_index.embeddings.ollama import OllamaEmbedding
-from ragas.llms import LangchainLLMWrapper
+from mlflow import MlflowClient
 from ragas.embeddings import LlamaIndexEmbeddingsWrapper
-from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall, answer_correctness
+from ragas.evaluation import EvaluationDataset, evaluate
+from ragas.llms import LangchainLLMWrapper
+from ragas.metrics import (
+    answer_correctness,
+    answer_relevancy,
+    context_precision,
+    context_recall,
+    faithfulness,
+)
 from ragas.run_config import RunConfig
-from ragas.evaluation import evaluate, EvaluationDataset
 
-from src.logger import logging
-from src.exception import CustomException
-from src.entity.config_entity import EvaluationConfig
 from src.components.generation import Generator
-from src.utils import save_json
 from src.config.configuration import ConfigurationManager
+from src.entity.config_entity import EvaluationConfig
+from src.exception import CustomException
+from src.logger import logging
+from src.utils import clean_content, extract_category, save_json
+
 
 class ChatAnthropicNoTemp(ChatAnthropic):
     def __setattr__(self, name, value):
@@ -34,20 +41,21 @@ class Evaluator:
         self.evaluation_config = config
         self.generator = generator
 
-    def extract_category(self, question: str) -> str:
-        match = re.search(r'"([^"]+)"', question)
-        category = match.group(1) if match else None
-        return category
+    def classify(self, answer: str) -> str:
+        if answer.startswith("[ERROR"):
+            return "error"
+        answer_lower = answer.lower()
+        if any(phrase in answer_lower for phrase in self.evaluation_config.absence_phrases):
+            return "true negative"
+        return "false positive"
 
-    def clean_content(self, text:str) -> str:
-        logging.info("starting cleaning contracts text")
-        try:
-            text = re.sub(r"[ \t]{2,}", " ", text)
-            text = re.sub(r"\n{3,}", "\n\n", text)
-            text = "\n".join(line.strip() for line in text.split('\n'))
-            return text.strip()
-        except Exception as e:
-            raise CustomException(e, sys)
+    def stratified_samples(self, pool: pd.DataFrame, n_samples: int) -> pd.DataFrame:
+        groups = [
+            group.sample(min(len(group), n_samples), random_state=42)
+            for _, group in pool.groupby("category")
+        ]
+        return pd.concat(groups, ignore_index=True)
+
 
     def build_eval_samples(self) -> tuple[list[dict], list[dict]]:
         logging.info("building evaluation samples...")
@@ -64,7 +72,7 @@ class Evaluator:
                 return positive_samples, negative_samples
 
             df = pd.read_json(self.evaluation_config.full_data_path, lines=True, compression="gzip")
-            df["category"] = df["question"].apply(self.extract_category)
+            df["category"] = df["question"].apply(extract_category)
             df["answer_text"] = df["answers"].apply(lambda x: x["text"])
 
             grouped = (df.groupby(["title", "question", "category"])["answer_text"].apply(
@@ -74,15 +82,10 @@ class Evaluator:
             positive_pool = grouped[grouped["answer_text"].str.len() > 0]
             negative_pool = grouped[grouped["answer_text"].str.len() == 0]
 
-            def stratified_samples(pool: pd.DataFrame, n_samples: int) -> pd.DataFrame:
-                return pool.groupby("category", group_keys=False).apply(
-                    lambda x: x.sample(min(len(x), n_samples), random_state=42)
-                )
-            
-            positive_df = stratified_samples(positive_pool, self.evaluation_config.n_per_category_positive)
-            negative_df = stratified_samples(negative_pool, self.evaluation_config.n_per_category_negative)
+            positive_df = self.stratified_samples(positive_pool, self.evaluation_config.n_per_category_positive)
+            negative_df = self.stratified_samples(negative_pool, self.evaluation_config.n_per_category_negative)
 
-            positive_df["clean_answer_text"] = positive_df["answer_text"].apply(lambda x: [self.clean_content(ans) for ans in x])
+            positive_df["clean_answer_text"] = positive_df["answer_text"].apply(lambda x: [clean_content(ans) for ans in x])
 
             positive_samples = [
                 {
@@ -194,15 +197,8 @@ class Evaluator:
             raise CustomException(e, sys)
 
     def evaluate_negative(self, results: list[dict]):
-        def classify(answer: str) -> str:
-            if answer.startswith("[ERROR"):
-                return "error"
-            answer_lower = answer.lower()
-            if any(phrase in answer_lower for phrase in self.evaluation_config.absence_phrases):
-                return "true negative"
-            return "false positive"
-
-        classifications = [classify(r["answer"]) for r in results]
+        
+        classifications = [self.classify(r["answer"]) for r in results]
         counts = Counter(classifications)
         total_classifiable = counts["true negative"] + counts["false positive"]
         fp_rate = counts["false positive"] / total_classifiable if total_classifiable else 0.0

@@ -1,9 +1,11 @@
-from src.utils import read_yaml, create_directories
-from src.constants import *
-from src.entity.config_entity import *
 from pathlib import Path
 
-class ConfigurationManager():
+from src.constants import *
+from src.entity.config_entity import *
+from src.utils import create_directories, read_yaml
+
+
+class ConfigurationManager:
     def __init__(self,
                  config_filepath = CONFIG_FILE_PATH,
                  params_filepath = PARAMS_FILE_PATH):

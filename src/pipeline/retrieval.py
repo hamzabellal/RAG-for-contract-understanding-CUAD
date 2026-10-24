@@ -1,8 +1,9 @@
-from src.logger import logging
-from src.exception import CustomException
-from src.config.configuration import ConfigurationManager
-from src.components.retrieval import Retrieval
 import sys
+
+from src.components.retrieval import Retrieval
+from src.config.configuration import ConfigurationManager
+from src.exception import CustomException
+from src.logger import logging
 
 STAGE_NAME = "RETRIEVAL & RERANKING"
 

@@ -1,0 +1,46 @@
+name :  CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.12.4
+        ports:
+          - 6333:6333
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      
+      - name: Install CPU-only Pytorch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -e .
+        
+      - name: Wait for Qdrant
+        run: |
+          for i in $(seq 1 10); do
+            curl -sf http://localhost:6333/collections && break
+            sleep 2
+          done
+      
+      - name: Lint with ruff
+        run: ruff check src/ tests/ main.py
+
+      - name: Run tests
+        run: pytest tests/unit/ tests/integration/ -v

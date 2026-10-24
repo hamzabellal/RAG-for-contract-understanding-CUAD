@@ -1,11 +1,13 @@
 import sys
-import os
-import re
+
 import pandas as pd
-from src.logger import logging
-from src.exception import CustomException
+from datasets import concatenate_datasets, load_dataset
+
 from src.entity.config_entity import DataIngestionConfig
-from datasets import load_dataset, concatenate_datasets
+from src.exception import CustomException
+from src.logger import logging
+from src.utils import clean_content
+
 
 class DataIngestion:
     def __init__(self, config: DataIngestionConfig):
@@ -28,15 +30,6 @@ class DataIngestion:
         except Exception as e:
             raise CustomException(e, sys)
         
-    def clean_content(self, text:str) -> str:
-        logging.info("starting cleaning contracts text")
-        try:
-            text = re.sub(r"[ \t]{2,}", " ", text)
-            text = re.sub(r"\n{3,}", "\n\n", text)
-            text = "\n".join(line.strip() for line in text.split('\n'))
-            return text.strip()
-        except Exception as e:
-            raise CustomException(e, sys)
 
     def initiate_data_ingestion(self):
         logging.info("starting data ingestion component")
@@ -53,9 +46,9 @@ class DataIngestion:
             df_unique_contracts.to_parquet(self.ingestion_config.contracts, index=False)
             logging.info(f"saved unique contracts at {self.ingestion_config.contracts}")
 
-            df_unique_contracts["clean_content"] = df_unique_contracts["content"].apply(self.clean_content)
+            df_unique_contracts["clean_content"] = df_unique_contracts["content"].apply(clean_content)
             df_unique_contracts.to_parquet(self.ingestion_config.cleaned_contracts, index=False)
-            logging.info(f"content cleaning done succesfully and saved")
+            logging.info("content cleaning done succesfully and saved")
 
             content_len = df_unique_contracts["content"].str.len()
             clean_len = df_unique_contracts["clean_content"].str.len()
