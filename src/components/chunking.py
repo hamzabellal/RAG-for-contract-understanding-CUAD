@@ -1,12 +1,14 @@
-from src.logger import logging
-from src.exception import CustomException
-from src.entity.config_entity import ChunkingConfig
 import sys
-from transformers import AutoTokenizer
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core import Document
 from collections import defaultdict
+
 import pandas as pd
+from llama_index.core import Document
+from llama_index.core.node_parser import SentenceSplitter
+from transformers import AutoTokenizer
+
+from src.entity.config_entity import ChunkingConfig
+from src.exception import CustomException
+from src.logger import logging
 
 
 class Chunker:

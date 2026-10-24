@@ -1,16 +1,18 @@
-from src.logger import logging
-from src.exception import CustomException
 import sys
-import pandas as pd
+import uuid
 from datetime import datetime
+
+import pandas as pd
+from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.core.schema import TextNode
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from llama_index.core import VectorStoreIndex, StorageContext
 from qdrant_client import QdrantClient
+
 from src.entity.config_entity import EmbeddingIndexingConfig
+from src.exception import CustomException
+from src.logger import logging
 from src.utils import save_json
-import uuid
 
 
 class EmbeddingIndexing:
@@ -46,7 +48,7 @@ class EmbeddingIndexing:
 
             logging.info("building index...")
             storage_context = StorageContext.from_defaults(vector_store=vector_store)
-            index = VectorStoreIndex(textnodes, storage_context=storage_context, embed_model=embed_model)
+            VectorStoreIndex(textnodes, storage_context=storage_context, embed_model=embed_model)
 
             logging.info("indexing done successfully")
 

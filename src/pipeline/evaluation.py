@@ -1,10 +1,10 @@
 import sys
-from src.logger import logging
-from src.exception import CustomException
-from src.config.configuration import ConfigurationManager
+
 from src.components.evaluation import Evaluator
+from src.config.configuration import ConfigurationManager
+from src.exception import CustomException
+from src.logger import logging
 from src.pipeline.generation import GenerationPipeline
-from pathlib import Path
 
 STAGE_NAME = "EVALUATION"
 

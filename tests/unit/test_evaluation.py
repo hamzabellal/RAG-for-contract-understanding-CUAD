@@ -1,6 +1,9 @@
 from types import SimpleNamespace
+
 import pandas as pd
+
 from src.components.evaluation import Evaluator
+
 
 def make_evaluator(absence_phrases=None):
     config = SimpleNamespace(absence_phrases=absence_phrases or [

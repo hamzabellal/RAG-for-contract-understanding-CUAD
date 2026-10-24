@@ -1,10 +1,10 @@
 import pandas as pd
 import pytest
 from qdrant_client import QdrantClient
-from src.entity.config_entity import EmbeddingIndexingConfig, RetrievalConfig
+
 from src.components.embedding_indexing import EmbeddingIndexing
 from src.components.retrieval import Retrieval
-
+from src.entity.config_entity import EmbeddingIndexingConfig, RetrievalConfig
 
 QDRANT_URL = "http://localhost:6333"
 TEST_COLLECTION = "test_retrieval_collection"

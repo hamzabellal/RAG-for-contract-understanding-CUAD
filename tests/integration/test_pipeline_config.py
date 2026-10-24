@@ -1,9 +1,10 @@
 import subprocess
 import sys
 from pathlib import Path
-import yaml
-from main import STAGES
 
+import yaml
+
+from main import STAGES
 from src.config.configuration import ConfigurationManager
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -31,6 +32,7 @@ def test_main_help_lists_all_stages():
         [sys.executable, "main.py", "--help"],
         capture_output=True,
         text=True,
+        check=False,
         cwd=PROJECT_ROOT,
     )
     assert result.returncode == 0

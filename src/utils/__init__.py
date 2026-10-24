@@ -1,15 +1,16 @@
-import sys
-import os
-from pathlib import Path
-import yaml
 import json
+import os
+import re
+import sys
+from pathlib import Path
+
+import yaml
 from box import ConfigBox
 from box.exceptions import BoxValueError
-from src.logger import logging
-from src.exception import CustomException
 from ensure import ensure_annotations
-from typing import Union, Optional
-import re
+
+from src.exception import CustomException
+from src.logger import logging
 
 
 @ensure_annotations
@@ -33,7 +34,7 @@ def create_directories(path_to_directories: list, verbose=True):
 
 
 @ensure_annotations
-def save_json(filepath: Path, obj: Union[dict, list]):
+def save_json(filepath: Path, obj: dict | list):
     try:
         dir_name = os.path.dirname(filepath)
         os.makedirs(dir_name, exist_ok=True)
@@ -56,7 +57,7 @@ def clean_content(text:str) -> str:
 
 
 @ensure_annotations
-def extract_category(question: str) -> Optional[str]:
+def extract_category(question: str) -> str | None:
     logging.info("extracting corresponding category")
     try:
         match = re.search(r'"([^"]+)"', question)

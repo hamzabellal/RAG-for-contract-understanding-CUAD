@@ -1,10 +1,13 @@
 import sys
+
 import pandas as pd
-from src.logger import logging
-from src.exception import CustomException
+from datasets import concatenate_datasets, load_dataset
+
 from src.entity.config_entity import DataIngestionConfig
+from src.exception import CustomException
+from src.logger import logging
 from src.utils import clean_content
-from datasets import load_dataset, concatenate_datasets
+
 
 class DataIngestion:
     def __init__(self, config: DataIngestionConfig):
@@ -45,7 +48,7 @@ class DataIngestion:
 
             df_unique_contracts["clean_content"] = df_unique_contracts["content"].apply(clean_content)
             df_unique_contracts.to_parquet(self.ingestion_config.cleaned_contracts, index=False)
-            logging.info(f"content cleaning done succesfully and saved")
+            logging.info("content cleaning done succesfully and saved")
 
             content_len = df_unique_contracts["content"].str.len()
             clean_len = df_unique_contracts["clean_content"].str.len()

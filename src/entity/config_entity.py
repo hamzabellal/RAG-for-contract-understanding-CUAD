@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
-from box import ConfigBox
+
 
 @dataclass(frozen=True)
 class DataIngestionConfig:
@@ -39,8 +38,8 @@ class RetrievalConfig:
     reranker_model_name: str
     embedding_model_name: str
     sparse_model_name: str
-    tier1_categories: List[str]
-    tier3_categories: List[str]
+    tier1_categories: list[str]
+    tier3_categories: list[str]
     retrieve_top_k: int
     sparse_top_k: int
     rerank_top_n: int
@@ -75,5 +74,5 @@ class EvaluationConfig:
     n_per_category_negative: int
     judge_model_name: str
     judge_embeddings_model_name: str
-    absence_phrases: List[str]
+    absence_phrases: list[str]
     batch_size : int

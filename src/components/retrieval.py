@@ -1,17 +1,18 @@
-import sys
-from src.logger import logging
-from src.exception import CustomException
-from src.entity.config_entity import RetrievalConfig
-from src.utils import extract_category
 import re
+import sys
+
 import pandas as pd
-from pathlib import Path
-from llama_index.core.vector_stores import MetadataFilters, ExactMatchFilter
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import VectorStoreIndex
 from llama_index.core.postprocessor import SentenceTransformerRerank
+from llama_index.core.vector_stores import ExactMatchFilter, MetadataFilters
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
+
+from src.entity.config_entity import RetrievalConfig
+from src.exception import CustomException
+from src.logger import logging
+from src.utils import extract_category
 
 
 class Retrieval:

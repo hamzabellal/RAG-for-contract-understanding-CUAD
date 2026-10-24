@@ -1,15 +1,17 @@
-import sys
-import os
 import json
-from src.logger import logging
-from src.exception import CustomException
-from src.entity.config_entity import GenerationConfig
-from src.components.retrieval import Retrieval
-from src.utils import save_json
-from src.components.prompts import PROMPT, REASONING_INSTRUCTION
-from llama_index.llms.ollama import Ollama
+import os
+import sys
 from pathlib import Path
+
+from llama_index.llms.ollama import Ollama
 from tqdm import tqdm
+
+from src.components.prompts import PROMPT, REASONING_INSTRUCTION
+from src.components.retrieval import Retrieval
+from src.entity.config_entity import GenerationConfig
+from src.exception import CustomException
+from src.logger import logging
+from src.utils import save_json
 
 
 class Generator:

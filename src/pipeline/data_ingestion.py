@@ -1,8 +1,9 @@
-from src.logger import logging
-from src.exception import CustomException
+import sys
+
 from src.components.data_ingestion import DataIngestion
 from src.config.configuration import ConfigurationManager
-import sys
+from src.exception import CustomException
+from src.logger import logging
 
 STAGE_NAME = "DATA INGESTION"
 

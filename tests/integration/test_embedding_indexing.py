@@ -2,8 +2,8 @@ import pandas as pd
 import pytest
 from qdrant_client import QdrantClient
 
-from src.entity.config_entity import EmbeddingIndexingConfig
 from src.components.embedding_indexing import EmbeddingIndexing
+from src.entity.config_entity import EmbeddingIndexingConfig
 
 QDRANT_URL = "http://localhost:6333"
 TEST_COLLECTION = "test_integration_collection"

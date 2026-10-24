@@ -1,4 +1,5 @@
-from src.utils import extract_category, clean_content
+from src.utils import clean_content, extract_category
+
 
 def test_extract_category_returns_category_in_quotes():
     question = 'Highlight the parts related to "Governing Law" that...'
