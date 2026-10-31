@@ -1,6 +1,6 @@
 import csv
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -47,7 +47,7 @@ def submit_feedback(feedback: FeedbackRequest):
         if not file_exists:
             writer.writerow(["timestamp", "title", "question", "answer", "rating", "comment"])
         writer.writerow([
-            datetime.now(timezone.utc).isoformat(),
+            datetime.now(UTC).isoformat(),
             feedback.title,
             feedback.question,
             feedback.answer,

@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -17,4 +17,4 @@ class FeedbackRequest(BaseModel):
     question: str
     answer: str
     rating: Literal["like", "dislike"]
-    comment: Optional[str] = None
+    comment: str | None = None
