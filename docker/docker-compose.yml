@@ -23,6 +23,7 @@ services:
   mlflow:
     build:
       context: ../docker
+      dockerfile: mlflow.Dockerfile
     container_name: cuad_mlflow
     ports:
       - "5001:5000"
