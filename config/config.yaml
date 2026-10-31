@@ -27,6 +27,7 @@ retrieval:
 
 generation:
   root_dir: artifacts/generation
+  ollama_base_url: "http://localhost:11434"
 
 evaluation:
   root_dir: artifacts/evaluation

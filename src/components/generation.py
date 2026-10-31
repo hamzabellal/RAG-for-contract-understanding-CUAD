@@ -27,6 +27,7 @@ class Generator:
         try:
             self.llm = Ollama(
                 model = self.generation_config.llm_model_name,
+                base_url = self.generation_config.ollama_base_url,
                 request_timeout = self.generation_config.request_timeout,
                 temperature = self.generation_config.temperature
             )

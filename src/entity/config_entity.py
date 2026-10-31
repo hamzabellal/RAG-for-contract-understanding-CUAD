@@ -50,6 +50,7 @@ class RetrievalConfig:
 @dataclass(frozen=True)
 class GenerationConfig:
     root_dir: Path
+    ollama_base_url: str
     llm_model_name: str
     request_timeout: int
     temperature: float
