@@ -39,3 +39,20 @@ services:
     volumes:
       - ../mlflow_artifacts:/mlflow/artifacts
     restart: unless-stopped
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    container_name: cuad_api
+    ports:
+      - "8000:8000"
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    depends_on:
+      - qdrant
+    volumes:
+      - ../artifacts/chunking:/app/artifacts/chunking
+      - ../artifacts/feedback:/app/artifacts/feedback
+    restart: unless-stopped
