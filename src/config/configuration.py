@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from src.constants import *
 from src.entity.config_entity import *
@@ -55,7 +56,7 @@ class ConfigurationManager:
         embedding_config = EmbeddingIndexingConfig(
             root_dir = Path(config.root_dir),
             chunks_path = Path(config.chunks_path),
-            qdrant_url = config.qdrant_url,
+            qdrant_url = os.environ.get("QDRANT_URL", config.qdrant_url),
             collection_name = config.collection_name,
             embedding_model_name = params.embedding_model_name,
             sparse_model_name = params.sparse_model_name,
@@ -73,7 +74,7 @@ class ConfigurationManager:
         retrieval_config = RetrievalConfig(
             root_dir = Path(config.root_dir),
             chunks_path = Path(config.chunks_path),
-            qdrant_url = config.qdrant_url,
+            qdrant_url = os.environ.get("QDRANT_URL", config.qdrant_url),
             collection_name = config.collection_name,
             reranker_model_name = params.reranker_model_name,
             embedding_model_name = params.embedding_model_name,
@@ -98,6 +99,7 @@ class ConfigurationManager:
 
         generation_config = GenerationConfig(
             root_dir = Path(config.root_dir),
+            ollama_base_url = os.environ.get("OLLAMA_BASE_URL", config.ollama_base_url),
             llm_model_name = params.llm_model_name,
             request_timeout = params.request_timeout,
             temperature = params.temperature,
