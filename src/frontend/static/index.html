@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CUAD Contract Review Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>CUAD RAG</h2>
+      <p>This assistant reviews a <strong>specific, known contract</strong> and answers questions about its clauses, based on the CUAD clause taxonomy.</p>
+      <p>It does not search across a library of contracts — you need to know which contract you're asking about.</p>
+      <button id="clear-btn" class="secondary-btn" type="button">Clear conversation</button>
+    </aside>
+
+    <main class="chat-column">
+      <div class="composer-card">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="title">Contract title</label>
+            <input type="text" id="title" placeholder="e.g. ABILITYINC_06_15_2020-EX-4.25-SERVICES AGREEMENT">
+          </div>
+          <div class="form-field">
+            <label for="category">Clause category</label>
+            <select id="category"></select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="details">Details</label>
+          <textarea id="details" rows="3" placeholder="e.g. Which state or country's law governs the interpretation of the contract?"></textarea>
+        </div>
+        <button id="submit-btn" class="primary-btn" type="button">Ask</button>
+      </div>
+
+      <div id="chat-history"></div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
