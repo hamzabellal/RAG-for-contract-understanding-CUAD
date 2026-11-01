@@ -36,6 +36,7 @@ services:
         --backend-store-uri postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
         --serve-artifacts
         --artifacts-destination /mlflow/artifacts
+        --allowed-hosts localhost,localhost:5001,mlflow,mlflow:5000
         --host 0.0.0.0 
         --port 5000
     volumes:
@@ -52,9 +53,30 @@ services:
     environment:
       - QDRANT_URL=http://qdrant:6333
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - FEEDBACK_DB_HOST=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
     depends_on:
       - qdrant
     volumes:
       - ../artifacts/chunking:/app/artifacts/chunking
       - ../artifacts/feedback:/app/artifacts/feedback
+    restart: unless-stopped
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.feedback-monitor.schedule: "@daily"
+      ofelia.job-exec.feedback-monitor.command: "python main.py feedback_monitor"
+      ofelia.job-exec.drift-monitoring.schedule: "@weekly"
+      ofelia.job-exec.drift-monitoring.command: "python main.py drift_monitoring_evaluation"
+
+  scheduler:
+    image: mcuadros/ofelia:latest
+    container_name: cuad_scheduler
+    depends_on:
+      - api
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped

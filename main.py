@@ -1,5 +1,6 @@
 import argparse
 import sys
+from dotenv import load_dotenv
 
 from src.config.configuration import ConfigurationManager
 from src.exception import CustomException
@@ -10,7 +11,11 @@ from src.pipeline.embedding_indexing import EmbeddingIndexingPipeline
 from src.pipeline.eval_samples import EvalSamplesPipeline
 from src.pipeline.evaluation import EvaluationPipeline
 from src.pipeline.generation import GenerationPipeline
+from src.pipeline.feedback_monitor import FeedbackMonitorPipeline
+from src.pipeline.drift_monitoring import DriftMonitoringPipeline
 
+
+load_dotenv()
 
 def run_data_ingestion():
     DataIngestionPipeline().main()
@@ -41,8 +46,14 @@ def run_evaluation():
     evaluator = EvaluationPipeline().main()
     evaluator.run()
 
+def run_feedback_monitor():
+    FeedbackMonitorPipeline().main()
 
-STAGES = {
+def run_drift_monitoring():
+    DriftMonitoringPipeline().main()
+
+
+PIPELINE_STAGES = {
     "data_ingestion": run_data_ingestion,
     "chunking": run_chunking,
     "embedding_indexing": run_embedding_indexing,
@@ -51,6 +62,12 @@ STAGES = {
     "evaluation": run_evaluation,
 }
 
+OPERATIONAL_STAGES = {
+    "feedback_monitor": run_feedback_monitor,
+    "drift_monitoring_evaluation": run_drift_monitoring,
+}
+
+STAGES = {**PIPELINE_STAGES, **OPERATIONAL_STAGES}
 
 def run_stage(name):
     logging.info(f"stage {name} started")
@@ -66,7 +83,7 @@ def main():
     parser.add_argument("stage", nargs="?", choices=list(STAGES), help="stage to run; omit to run all stages in order")
     args = parser.parse_args()
 
-    stages = [args.stage] if args.stage else list(STAGES)
+    stages = [args.stage] if args.stage else list(PIPELINE_STAGES)
     for name in stages:
         run_stage(name)
 
