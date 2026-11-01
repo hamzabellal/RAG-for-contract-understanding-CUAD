@@ -3,6 +3,7 @@ import os
 import re
 import sys
 from pathlib import Path
+import psycopg2
 
 import yaml
 from box import ConfigBox
@@ -65,3 +66,13 @@ def extract_category(question: str) -> str | None:
         return category
     except Exception as e:
         raise CustomException(e, sys)
+
+@ensure_annotations
+def get_db_connection(api_config):
+    return psycopg2.connect(
+        host=api_config.feedback_db_host,
+        port=api_config.feedback_db_port,
+        user=api_config.feedback_db_user,
+        password=api_config.feedback_db_password,
+        dbname=api_config.feedback_db_name,
+    )
