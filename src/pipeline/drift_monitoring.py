@@ -1,4 +1,5 @@
 import sys
+
 from src.components.evaluation import Evaluator
 from src.config.configuration import ConfigurationManager
 from src.exception import CustomException

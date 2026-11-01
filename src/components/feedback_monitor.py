@@ -1,6 +1,6 @@
 # src/components/feedback_monitor.py
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import mlflow
 
@@ -28,7 +28,7 @@ class FeedbackMonitor:
                         WHERE timestamp >= %s
                         GROUP BY rating
                         """,
-                        (datetime.now(timezone.utc) - timedelta(days=self.monitoring_config.feedback_window_days),),
+                        (datetime.now(UTC) - timedelta(days=self.monitoring_config.feedback_window_days),),
                     )
                     counts = dict(cur.fetchall())
             finally:

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import yaml
 
-from main import STAGES
+from main import PIPELINE_STAGES
 from src.config.configuration import ConfigurationManager
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -44,6 +44,6 @@ def test_main_stages_match_dvc_yaml_stages():
         dvc_config = yaml.safe_load(f)
 
     dvc_stage_names = set(dvc_config["stages"].keys())
-    main_stage_names = set(STAGES)
+    main_stage_names = set(PIPELINE_STAGES)
 
     assert dvc_stage_names == main_stage_names

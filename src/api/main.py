@@ -5,9 +5,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 
 from src.api.schemas import AnswerResponse, FeedbackRequest, QuestionRequest
+from src.config.configuration import ConfigurationManager
 from src.logger import logging
 from src.pipeline.generation import GenerationPipeline
-from src.config.configuration import ConfigurationManager
 from src.utils import get_db_connection
 
 

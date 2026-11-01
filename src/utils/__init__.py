@@ -3,8 +3,8 @@ import os
 import re
 import sys
 from pathlib import Path
-import psycopg2
 
+import psycopg2
 import yaml
 from box import ConfigBox
 from box.exceptions import BoxValueError
