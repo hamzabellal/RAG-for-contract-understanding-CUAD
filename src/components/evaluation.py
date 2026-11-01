@@ -256,7 +256,7 @@ class Evaluator:
         params.update(prefixed("embedding", config_manager.get_embedding_config()))
         params.update(prefixed("retrieval", config_manager.get_retrieval_config()))
         params.update(prefixed("generation", config_manager.get_generation_config()))
-        params.update(prefixed("evaluation", config_manager.get_evaluation_config()))
+        params.update(prefixed("evaluation", self.evaluation_config))
         mlflow.log_params(params)
         
         positive_samples, negative_samples = self.build_eval_samples()

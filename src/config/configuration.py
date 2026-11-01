@@ -126,7 +126,7 @@ class ConfigurationManager:
             summary_by_category_path = Path(config.summary_by_category_path),
             negative_report_path = Path(config.negative_report_path),
             mlflow_run_id_path = Path(config.mlflow_run_id_path),
-            mlflow_tracking_uri = config.mlflow_tracking_uri,
+            mlflow_tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", config.mlflow_tracking_uri),
             mlflow_experiment_name = config.mlflow_experiment_name,
             n_per_category_positive = params.n_per_category_positive,
             n_per_category_negative = params.n_per_category_negative,
@@ -137,3 +137,67 @@ class ConfigurationManager:
         )
 
         return evaluation_config
+
+    def get_api_config(self) -> ApiConfig:
+        config = self.config.api
+
+        create_directories([config.root_dir])
+
+        api_config = ApiConfig(
+            root_dir = Path(config.root_dir),
+            feedback_db_host = os.environ.get("FEEDBACK_DB_HOST", config.feedback_db_host),
+            feedback_db_port = int(os.environ.get("FEEDBACK_DB_PORT", config.feedback_db_port)),
+            feedback_db_user = os.environ["POSTGRES_USER"],
+            feedback_db_password = os.environ["POSTGRES_PASSWORD"],
+            feedback_db_name = os.environ["POSTGRES_DB"]
+        )
+
+        return api_config
+
+    def get_monitoring_config(self) -> MonitoringConfig:
+        config = self.config.monitoring
+        params = self.params.monitoring
+
+        create_directories([config.root_dir])
+
+        monitoring_config = MonitoringConfig(
+            root_dir = Path(config.root_dir),
+            mlflow_tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", config.mlflow_tracking_uri),
+            mlflow_experiment_name = config.mlflow_experiment_name,
+            feedback_window_days = params.feedback_window_days,
+        )
+
+        return monitoring_config
+
+    def get_monitoring_evaluation_config(self) -> EvaluationConfig:
+        config = self.config.monitoring
+        params = self.params.monitoring
+
+        evaluation_config = self.config.evaluation
+        evaluation_params = self.params.evaluation
+
+        create_directories([config.root_dir])
+        
+        monitoring_evaluation_config = EvaluationConfig(
+            root_dir = Path(config.root_dir),
+            full_data_path = Path(evaluation_config.full_data_path),
+            positive_samples_path = Path(config.positive_samples_path),
+            negative_samples_path = Path(config.negative_samples_path),
+            positive_results_path = Path(config.positive_results_path),
+            negative_results_path = Path(config.negative_results_path),
+            ragas_scores_path = Path(config.ragas_scores_path),
+            summary_global_path = Path(config.summary_global_path),
+            summary_by_category_path = Path(config.summary_by_category_path),
+            negative_report_path = Path(config.negative_report_path),
+            mlflow_run_id_path = Path(config.mlflow_run_id_path),
+            mlflow_tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", config.mlflow_tracking_uri),
+            mlflow_experiment_name = config.drift_mlflow_experiment_name,
+            n_per_category_positive = params.n_per_category_positive,
+            n_per_category_negative = params.n_per_category_negative,
+            judge_model_name = evaluation_params.judge_model_name,
+            judge_embeddings_model_name = evaluation_params.judge_embeddings_model_name,
+            absence_phrases = evaluation_params.absence_phrases,
+            batch_size = evaluation_params.batch_size
+        )
+        
+        return monitoring_evaluation_config
