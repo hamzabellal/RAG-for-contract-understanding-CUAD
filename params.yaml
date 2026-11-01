@@ -39,3 +39,8 @@ evaluation:
     "no clause", "not applicable", "not included", "not found", "n/a", "absent"
   ]
   batch_size: 20
+
+monitoring:
+  feedback_window_days: 7
+  n_per_category_positive: 2
+  n_per_category_negative: 2

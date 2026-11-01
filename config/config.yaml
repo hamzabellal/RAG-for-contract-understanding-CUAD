@@ -43,3 +43,23 @@ evaluation:
   mlflow_tracking_uri : "http://localhost:5001"
   mlflow_run_id_path: artifacts/evaluation/mlflow_run.json
   mlflow_experiment_name : "run_v1"
+
+api:
+  root_dir: artifacts/api
+  feedback_db_host: "localhost"
+  feedback_db_port: 5432
+
+monitoring:
+  root_dir: artifacts/monitoring
+  mlflow_tracking_uri: "http://localhost:5001"
+  mlflow_experiment_name: "feedback_monitoring"
+  drift_mlflow_experiment_name: "evaluation_drift_monitoring"
+  positive_samples_path: artifacts/monitoring/positive_samples.json
+  negative_samples_path: artifacts/monitoring/negative_samples.json
+  positive_results_path: artifacts/monitoring/positive_results.json
+  negative_results_path: artifacts/monitoring/negative_results.json
+  ragas_scores_path: artifacts/monitoring/ragas_scores.json
+  summary_global_path: artifacts/monitoring/summary_global.json
+  summary_by_category_path: artifacts/monitoring/summary_by_category.json
+  negative_report_path: artifacts/monitoring/negative_report.json
+  mlflow_run_id_path: artifacts/monitoring/mlflow_run.json

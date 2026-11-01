@@ -77,3 +77,19 @@ class EvaluationConfig:
     judge_embeddings_model_name: str
     absence_phrases: list[str]
     batch_size : int
+
+@dataclass(frozen=True)
+class ApiConfig:
+    root_dir: Path
+    feedback_db_host: str
+    feedback_db_port: int
+    feedback_db_user: str
+    feedback_db_password: str
+    feedback_db_name: str
+
+@dataclass(frozen=True)
+class MonitoringConfig:
+    root_dir: Path
+    mlflow_tracking_uri: str
+    mlflow_experiment_name: str
+    feedback_window_days : int
