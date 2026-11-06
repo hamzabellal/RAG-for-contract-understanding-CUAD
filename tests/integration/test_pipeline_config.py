@@ -16,6 +16,8 @@ EXPECTED_STAGES = [
     "eval_samples",
     "generation",
     "evaluation",
+    "feedback_monitor",
+    "drift_monitoring_evaluation"
 ]
 
 def test_all_stage_configs_build_without_error():
@@ -26,6 +28,9 @@ def test_all_stage_configs_build_without_error():
     config_manager.get_retrieval_config()
     config_manager.get_generation_config()
     config_manager.get_evaluation_config()
+    config_manager.get_api_config()
+    config_manager.get_monitoring_config()
+    config_manager.get_monitoring_evaluation_config()
 
 def test_main_help_lists_all_stages():
     result = subprocess.run(
