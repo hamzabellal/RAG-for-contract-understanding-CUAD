@@ -15,6 +15,21 @@ class FeedbackMonitor:
     def __init__(self, config: MonitoringConfig):
         self.monitoring_config = config
 
+    @staticmethod
+    def _build_stats(counts: dict) -> dict:
+        like_count = counts.get("like", 0)
+        dislike_count = counts.get("dislike", 0)
+        total = like_count + dislike_count
+        like_ratio = like_count / total if total > 0 else None
+        
+        stats = {
+            "like_count": like_count,
+            "dislike_count": dislike_count,
+            "total_feedback": total,
+            "like_ratio": like_ratio,
+        }
+        return stats
+
     def compute_like_ratio(self) -> dict:
         logging.info("computing like/dislike ratio from feedback")
         try:
@@ -34,17 +49,7 @@ class FeedbackMonitor:
             finally:
                 conn.close()
 
-            like_count = counts.get("like", 0)
-            dislike_count = counts.get("dislike", 0)
-            total = like_count + dislike_count
-            like_ratio = like_count / total if total > 0 else None
-
-            stats = {
-                "like_count": like_count,
-                "dislike_count": dislike_count,
-                "total_feedback": total,
-                "like_ratio": like_ratio,
-            }
+            stats = self._build_stats(counts)
             logging.info(f"feedback stats over last {self.monitoring_config.feedback_window_days} days: {stats}")
             return stats
         except Exception as e:
