@@ -1,4 +1,4 @@
-from src.utils import clean_content, extract_category
+from src.utils import clean_content, extract_category, hash_password, verify_password
 
 
 def test_extract_category_returns_category_in_quotes():
@@ -38,3 +38,17 @@ def test_clean_content_empty_string():
 
 def test_clean_content_whitespace_only():
     assert clean_content("  \n\n  \n ") == ""
+
+def test_verify_password_accepts_correct_password():
+    hashed = hash_password("correct-password")
+    assert verify_password("correct-password", hashed)
+
+def test_verify_password_rejects_wrong_password():
+    hashed = hash_password("correct-password")
+    assert not verify_password("wrong-password", hashed)
+
+def test_hash_password_salts_each_call_differently():
+    assert hash_password("same-password") != hash_password("same-password")
+
+def test_verify_password_rejects_malformed_hash():
+    assert not verify_password("anything", "not-a-valid-hash")
