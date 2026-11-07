@@ -67,6 +67,8 @@ services:
       - ../artifacts/chunking:/app/artifacts/chunking
       - ../artifacts/feedback:/app/artifacts/feedback
       - ../artifacts/hf_cache:/root/.cache/huggingface
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     labels:
       ofelia.enabled: "true"
