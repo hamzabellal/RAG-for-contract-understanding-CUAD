@@ -37,6 +37,7 @@ anthropic>=0.40.0
 # API
 fastapi>=0.111.0
 uvicorn>=0.29.0
+itsdangerous>=2.2.0
 
 # tracking
 mlflow>=2.13.0

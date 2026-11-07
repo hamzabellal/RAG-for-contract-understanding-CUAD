@@ -60,4 +60,7 @@ jobs:
           POSTGRES_USER: test_user
           POSTGRES_PASSWORD: test_password
           POSTGRES_DB: test_feedback_db
+          SESSION_SECRET_KEY: test-session-secret-key
+          BOOTSTRAP_ADMIN_USERNAME: test-admin
+          BOOTSTRAP_ADMIN_PASSWORD: test-admin-password
         run: pytest tests/unit/ tests/integration/ -v

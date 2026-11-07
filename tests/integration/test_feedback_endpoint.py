@@ -1,9 +1,11 @@
 import pytest
 
 from src.api import main as api_main
-from src.api.schemas import FeedbackRequest
+from src.api.schemas import FeedbackRequest, UserPublic
 from src.config.configuration import ConfigurationManager
 from src.utils import get_db_connection
+
+TEST_USER = UserPublic(id=1, username="test-user", role="user")
 
 TEST_TITLE = "test-integration-contract"
 
@@ -40,7 +42,8 @@ def feedback_table(api_config):
                     question TEXT NOT NULL,
                     answer TEXT NOT NULL,
                     rating TEXT NOT NULL,
-                    comment TEXT
+                    comment TEXT,
+                    user_id INTEGER
                 )
             """)
         conn.commit()
@@ -69,7 +72,7 @@ def test_submit_feedback_writes_to_postgres(api_config, feedback_table):
         comment=None,
     )
 
-    result = api_main.submit_feedback(request)
+    result = api_main.submit_feedback(request, user=TEST_USER)
     assert result == {"status": "recorded"}
 
     conn = get_db_connection(api_config)

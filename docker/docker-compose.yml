@@ -58,11 +58,15 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
       - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - SESSION_SECRET_KEY=${SESSION_SECRET_KEY}
+      - BOOTSTRAP_ADMIN_USERNAME=${BOOTSTRAP_ADMIN_USERNAME}
+      - BOOTSTRAP_ADMIN_PASSWORD=${BOOTSTRAP_ADMIN_PASSWORD}
     depends_on:
       - qdrant
     volumes:
       - ../artifacts/chunking:/app/artifacts/chunking
       - ../artifacts/feedback:/app/artifacts/feedback
+      - ../artifacts/hf_cache:/root/.cache/huggingface
     restart: unless-stopped
     labels:
       ofelia.enabled: "true"
