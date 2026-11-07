@@ -86,6 +86,9 @@ class ApiConfig:
     feedback_db_user: str
     feedback_db_password: str
     feedback_db_name: str
+    session_secret_key: str
+    bootstrap_admin_username: str
+    bootstrap_admin_password: str
 
 @dataclass(frozen=True)
 class MonitoringConfig:

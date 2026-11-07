@@ -2,4 +2,4 @@
 exclude = ["notebook", "artifacts_exploration"]
 
 [tool.ruff.lint]
-ignore = ["BLE001"]
+ignore = ["BLE001", "B008"]

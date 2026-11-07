@@ -149,7 +149,10 @@ class ConfigurationManager:
             feedback_db_port = int(os.environ.get("FEEDBACK_DB_PORT", config.feedback_db_port)),
             feedback_db_user = os.environ["POSTGRES_USER"],
             feedback_db_password = os.environ["POSTGRES_PASSWORD"],
-            feedback_db_name = os.environ["POSTGRES_DB"]
+            feedback_db_name = os.environ["POSTGRES_DB"],
+            session_secret_key = os.environ["SESSION_SECRET_KEY"],
+            bootstrap_admin_username = os.environ["BOOTSTRAP_ADMIN_USERNAME"],
+            bootstrap_admin_password = os.environ["BOOTSTRAP_ADMIN_PASSWORD"]
         )
 
         return api_config
