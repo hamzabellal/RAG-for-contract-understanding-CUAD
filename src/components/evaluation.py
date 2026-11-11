@@ -276,6 +276,7 @@ class Evaluator:
         mlflow.log_artifact(self.evaluation_config.ragas_scores_path)
 
         mlflow.end_run()
+        run_id_path.unlink(missing_ok=True)
 
         report = {
             "positive": summary_global,
