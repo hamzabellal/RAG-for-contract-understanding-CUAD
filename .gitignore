@@ -28,12 +28,7 @@ mlartifacts/
 postgres_data/
 mlflow_artifacts/
 
-project_documentation_v1.pdf
-project_documentation_v2.pdf
-project_documentation_v3.pdf
-context.md
-context_v2.md
-context_v3.md
+documentation/
 
 .DS_Store
 .claude/
