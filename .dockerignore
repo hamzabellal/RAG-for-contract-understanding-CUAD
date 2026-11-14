@@ -1,0 +1,15 @@
+.git
+artifacts/
+artifacts_exploration/
+postgres_data/
+mlflow_artifacts/
+logs/
+notebook/
+tests/
+*.egg-info/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/

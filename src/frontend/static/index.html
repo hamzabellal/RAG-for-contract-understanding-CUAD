@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CUAD Contract Review Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="login-screen" class="login-screen hidden">
+    <form id="login-form" class="login-card">
+      <div class="brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+        <span>CUAD RAG</span>
+      </div>
+      <h1>Sign in</h1>
+      <div class="form-field">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" required>
+      </div>
+      <div class="form-field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+      </div>
+      <p id="login-error" class="login-error hidden"></p>
+      <button type="submit" class="primary-btn login-submit">Sign in</button>
+    </form>
+  </div>
+
+  <div id="app-root" class="layout hidden">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+          <span>CUAD RAG</span>
+        </div>
+        <span id="health-pill" class="health-pill" title="Checking API status...">
+          <span id="health-dot" class="health-dot"></span>
+        </span>
+      </div>
+
+      <div class="account-row">
+        <span id="account-username" class="account-username"></span>
+        <button id="logout-btn" class="text-btn" type="button">Log out</button>
+      </div>
+
+      <button id="admin-btn" class="new-question-btn hidden" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5Z"/><path d="M4 21c0-3.5 3.5-6 8-6s8 2.5 8 6"/></svg>
+        Admin
+      </button>
+
+      <button id="new-question-btn" class="new-question-btn" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New question
+      </button>
+
+      <div class="history-section">
+        <div class="history-heading">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>
+          History
+        </div>
+        <div id="history-list" class="history-list"></div>
+        <p id="history-empty" class="history-empty">Your past questions will show up here.</p>
+      </div>
+    </aside>
+
+    <main class="main-column">
+      <div class="topbar">
+        <span class="topbar-label">Contract Q&amp;A</span>
+      </div>
+
+      <div class="composer-card">
+        <h1>Ask a question</h1>
+
+        <div class="form-field">
+          <label for="title">Contract</label>
+          <div class="input-with-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A968A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="title" autocomplete="off" placeholder="Start typing a contract title…">
+          </div>
+          <div id="title-suggestions" class="title-suggestions hidden"></div>
+        </div>
+
+        <div class="form-field">
+          <label for="category">Clause category</label>
+          <select id="category"></select>
+        </div>
+
+        <div class="form-field">
+          <div class="details-label-row">
+            <label for="details">Details</label>
+            <button id="suggestion-chip" class="suggestion-chip" type="button"></button>
+          </div>
+          <textarea id="details" rows="2" placeholder="e.g. Which state or country's law governs the interpretation of the contract?"></textarea>
+        </div>
+
+        <button id="submit-btn" class="primary-btn" type="button">
+          Ask
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+
+      <div id="answer-panel"></div>
+    </main>
+  </div>
+
+  <div id="admin-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Admin</h2>
+        <button id="admin-close-btn" class="text-btn" type="button">Close</button>
+      </div>
+
+      <div class="modal-body">
+        <section class="modal-section">
+          <h3>Feedback stats</h3>
+          <div id="feedback-stats" class="feedback-stats"></div>
+        </section>
+
+        <section class="modal-section">
+          <h3>Create user</h3>
+          <form id="create-user-form" class="create-user-form">
+            <input type="text" id="new-user-username" placeholder="Username" autocomplete="off" required>
+            <input type="password" id="new-user-password" placeholder="Password" autocomplete="new-password" required>
+            <select id="new-user-role">
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
+            <button type="submit" class="primary-btn">Create</button>
+          </form>
+          <p id="create-user-error" class="login-error hidden"></p>
+        </section>
+
+        <section class="modal-section">
+          <h3>Users</h3>
+          <div id="admin-users-list" class="admin-users-list"></div>
+        </section>
+
+        <section class="modal-section">
+          <div class="modal-section-header">
+            <h3 id="admin-history-heading">User history</h3>
+          </div>
+          <div id="admin-history-list" class="admin-history-list"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

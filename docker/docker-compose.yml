@@ -1,0 +1,89 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    container_name: cuad_qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ../artifacts/qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    container_name: cuad_postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  mlflow:
+    build:
+      context: ../docker
+      dockerfile: mlflow.Dockerfile
+    container_name: cuad_mlflow
+    ports:
+      - "5001:5000"
+    depends_on: 
+      - postgres
+    command: >
+      mlflow server 
+        --backend-store-uri postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+        --serve-artifacts
+        --artifacts-destination /mlflow/artifacts
+        --allowed-hosts localhost,localhost:5001,mlflow,mlflow:5000
+        --host 0.0.0.0 
+        --port 5000
+    volumes:
+      - ../mlflow_artifacts:/mlflow/artifacts
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    container_name: cuad_api
+    ports:
+      - "8000:8000"
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - FEEDBACK_DB_HOST=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SESSION_SECRET_KEY=${SESSION_SECRET_KEY}
+      - BOOTSTRAP_ADMIN_USERNAME=${BOOTSTRAP_ADMIN_USERNAME}
+      - BOOTSTRAP_ADMIN_PASSWORD=${BOOTSTRAP_ADMIN_PASSWORD}
+    depends_on:
+      - qdrant
+    volumes:
+      - ../artifacts/chunking:/app/artifacts/chunking
+      - ../artifacts/feedback:/app/artifacts/feedback
+      - ../artifacts/hf_cache:/root/.cache/huggingface
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.feedback-monitor.schedule: "0 0 0 * * *"
+      ofelia.job-exec.feedback-monitor.command: "python main.py feedback_monitor"
+      ofelia.job-exec.drift-monitoring.schedule: "0 0 0 * * 0"
+      ofelia.job-exec.drift-monitoring.command: "python main.py drift_monitoring_evaluation"
+
+  scheduler:
+    image: mcuadros/ofelia:latest
+    container_name: cuad_scheduler
+    depends_on:
+      - api
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped

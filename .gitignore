@@ -15,7 +15,20 @@ secrets.yaml
 
 logs/
 *.log
-artifacts/
+
+artifacts/**/*
+!artifacts/**/
+!artifacts/**/*.dvc
+!artifacts/**/.gitignore
+
+artifacts_exploration/
 mlruns/
 mlartifacts/
 .mlflow/
+postgres_data/
+mlflow_artifacts/
+
+documentation/
+
+.DS_Store
+.claude/

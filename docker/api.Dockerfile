@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --default-timeout=180 --retries 5 torch --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir --default-timeout=180 --retries 5 -r requirements.txt
+
+COPY src/ src/
+COPY config/ config/
+COPY params.yaml .
+COPY main.py .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

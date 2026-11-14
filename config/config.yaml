@@ -1,0 +1,65 @@
+artifacts_root : artifacts
+
+data_ingestion:
+  root_dir: artifacts/data_ingestion
+  data_source: "theatticusproject/cuad-qa"
+  full_data_dir: artifacts/data_ingestion/full_data.jsonl.gz
+  contracts: artifacts/data_ingestion/unique_contracts.parquet
+  cleaned_contracts: artifacts/data_ingestion/cleaned_contracts.parquet
+
+chunking:
+  root_dir: artifacts/chunking
+  data_source: artifacts/data_ingestion/cleaned_contracts.parquet
+  chunks_path: artifacts/chunking/chunks.parquet
+
+embedding:
+  root_dir: artifacts/embeddings
+  chunks_path: artifacts/chunking/chunks.parquet
+  qdrant_url: "http://localhost:6333"
+  collection_name: "cuad_bge_large_bm25_hybrid"
+  report_path: artifacts/embeddings/indexing_report.json
+
+retrieval:
+  root_dir: artifacts/retrieval
+  chunks_path: artifacts/chunking/chunks.parquet
+  qdrant_url: "http://localhost:6333"
+  collection_name: "cuad_bge_large_bm25_hybrid"
+
+generation:
+  root_dir: artifacts/generation
+  ollama_base_url: "http://localhost:11434"
+
+evaluation:
+  root_dir: artifacts/evaluation
+  full_data_path: artifacts/data_ingestion/full_data.jsonl.gz
+  positive_samples_path: artifacts/evaluation/positive_samples.json
+  negative_samples_path: artifacts/evaluation/negative_samples.json
+  positive_results_path: artifacts/evaluation/positive_results.json
+  negative_results_path: artifacts/evaluation/negative_results.json
+  ragas_scores_path: artifacts/evaluation/ragas_scores.json
+  summary_global_path: artifacts/evaluation/summary_global.json
+  summary_by_category_path: artifacts/evaluation/summary_by_category.json
+  negative_report_path: artifacts/evaluation/negative_report.json
+  mlflow_tracking_uri : "http://localhost:5001"
+  mlflow_run_id_path: artifacts/evaluation/mlflow_run.json
+  mlflow_experiment_name : "run_v1"
+
+api:
+  root_dir: artifacts/api
+  feedback_db_host: "localhost"
+  feedback_db_port: 5432
+
+monitoring:
+  root_dir: artifacts/monitoring
+  mlflow_tracking_uri: "http://localhost:5001"
+  mlflow_experiment_name: "feedback_monitoring"
+  drift_mlflow_experiment_name: "evaluation_drift_monitoring"
+  positive_samples_path: artifacts/monitoring/positive_samples.json
+  negative_samples_path: artifacts/monitoring/negative_samples.json
+  positive_results_path: artifacts/monitoring/positive_results.json
+  negative_results_path: artifacts/monitoring/negative_results.json
+  ragas_scores_path: artifacts/monitoring/ragas_scores.json
+  summary_global_path: artifacts/monitoring/summary_global.json
+  summary_by_category_path: artifacts/monitoring/summary_by_category.json
+  negative_report_path: artifacts/monitoring/negative_report.json
+  mlflow_run_id_path: artifacts/monitoring/mlflow_run.json
