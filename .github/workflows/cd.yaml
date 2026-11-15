@@ -1,0 +1,102 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: eu-west-3
+  INSTANCE_ID: i-0e5edf66e324086ae
+  EC2_USER: ubuntu
+  DEPLOY_PATH: RAG-for-contract-understanding-CUAD
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check current instance state
+        id: state
+        run: |
+          STATE=$(aws ec2 describe-instances --instance-ids "$INSTANCE_ID" \
+            --query 'Reservations[0].Instances[0].State.Name' --output text)
+          echo "Instance is currently: $STATE"
+          echo "initial_state=$STATE" >> "$GITHUB_OUTPUT"
+
+      - name: Start instance if it was stopped
+        if: steps.state.outputs.initial_state == 'stopped'
+        run: |
+          aws ec2 start-instances --instance-ids "$INSTANCE_ID"
+          aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+
+      - name: Get current public IP
+        id: ip
+        run: |
+          IP=$(aws ec2 describe-instances --instance-ids "$INSTANCE_ID" \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+          echo "Public IP: $IP"
+          echo "ip=$IP" >> "$GITHUB_OUTPUT"
+
+      - name: Set up deploy SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Wait for SSH to be reachable
+        env:
+          IP: ${{ steps.ip.outputs.ip }}
+        run: |
+          for i in $(seq 1 30); do
+            if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i ~/.ssh/deploy_key "$EC2_USER@$IP" "echo ready" 2>/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Timed out waiting for SSH to come up" >&2
+          exit 1
+
+      - name: Deploy (git reset to main + rebuild api)
+        env:
+          IP: ${{ steps.ip.outputs.ip }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key "$EC2_USER@$IP" "
+            set -e
+            cd ~/$DEPLOY_PATH
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose --env-file .env -f docker/docker-compose.yml up -d --build
+          "
+
+      - name: Smoke test
+        env:
+          IP: ${{ steps.ip.outputs.ip }}
+        run: |
+          for i in $(seq 1 24); do
+            CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://$IP:8000/" || echo 000)
+            if [ "$CODE" = "200" ]; then
+              echo "App is up (HTTP $CODE)"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $CODE, retrying in 10s..."
+            sleep 10
+          done
+          echo "App did not become healthy after deploy" >&2
+          exit 1
+
+      - name: Stop instance again if it was stopped before this run
+        if: always() && steps.state.outputs.initial_state == 'stopped'
+        run: aws ec2 stop-instances --instance-ids "$INSTANCE_ID"
+
+      - name: Clean up SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
